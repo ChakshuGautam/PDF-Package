@@ -138,6 +138,9 @@ dmypy.json
 .pyre/
 
 google-creds.json
+gcs-creds-af.json
+
+src/plugin/html_plugin/data
 
 .vscode
 

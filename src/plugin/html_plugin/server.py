@@ -7,7 +7,7 @@ from flask import request
 from utils.func import initialize_logger
 from db.app import create_app, DB
 from db.models import BackupPdfData
-from .external import ODKSheetsPlugin
+from .external import HTMLPlugin
 import traceback
 
 
@@ -15,17 +15,6 @@ app = create_app()
 
 
 ## Route for saksham samiksha
-"""
-Following ODK forms are related to this route:
-1. Elem mentor visit elem_men_v1
-2. Elem monitor visit elem_mon_v1
-3. Sec mentor visit sec_men_v1
-4. Sec monitor visit sec_mon_v1
-5. Elem SSA visit elem_ssa_v1
-6. Sec SSA visit sec_ssa_v1
-7. SAT visit sat_v2
-8. SLO visit slo_v2
-"""
 @app.route("/", methods=['POST'])
 def index():
     """
@@ -37,7 +26,7 @@ def index():
 @app.route("/saksham-custom", methods=['POST'])
 def get_pdf_for_saksham():
     """
-    receive request from another server and save it in queue
+    Receive request for PDF conversion
     """
     try:
         logging = initialize_logger()
@@ -57,7 +46,7 @@ def get_pdf_for_saksham():
         DB.session.flush()  # Pushing the object to the database so that it gets assigned a unique id
         unique_ids.append(json_data.unique_id)
         DB.session.commit()  # Commits all changes
-        obj = ODKSheetsPlugin()
+        obj = HTMLPlugin()
         error = obj.fetch_data()
         if not error:
             status = 'done'

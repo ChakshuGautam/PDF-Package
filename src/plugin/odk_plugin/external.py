@@ -4,6 +4,8 @@ Plugin for getting data from another server and generate pdf from it
 import json
 import os.path
 import gspread
+import traceback
+
 from oauth2client.service_account import ServiceAccountCredentials
 from flask import request
 from kafka import KafkaProducer
@@ -82,6 +84,7 @@ class ODKSheetsPlugin(GoogleDocsSheetsPlugin):
             # Converting unicodes to str and then str to dict.
             req_data = json.loads(json.dumps(request.json))
 
+
             # Getting the form ID to distinguish between various template document and mapping sheet
             form_id = req_data['formId']
             new_req_data = req_data['data'][0]  # Getting the data : [{values}]
@@ -140,10 +143,13 @@ class ODKSheetsPlugin(GoogleDocsSheetsPlugin):
             kafka_producer = self.connect_kafka_producer()
             value = json.dumps(raw_data)
             error = self.publish_message(kafka_producer, KAFKA_CREDENTIAL['topic'],
-                                         KAFKA_CREDENTIAL['group_id'], value)
+                                         KAFKA_CREDENTIAL['group'], value)
             self.logger.info("Step0 End - instance id %s - Form id %s", instance_id, form_id)
         except Exception as ex:
+            print(traceback.format_exc())
             error = "Failed to fetch mapping detials"
             self.logger.error("Error0 %s", error)
             self.logger.error("Exception occurred", exc_info=True)
         return error
+    
+    

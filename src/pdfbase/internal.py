@@ -150,7 +150,8 @@ class PDFBuilder:
                         pdf_data.step = 2
                         pdf_data.doc_name = file_build[0]
                         pdf_data.doc_url = file_build[2]
-                        file_downloaded = self._plugin.upload_pdf(file_name, pdf_data.doc_url)
+                        pdf_data.file_path = file_build[3]
+                        file_downloaded = self._plugin.upload_pdf(file_name, pdf_data.doc_url, pdf_data.file_path)
                         upload_file_url = file_downloaded[0]
                         file_error = file_downloaded[1]
                         if not file_error:
@@ -207,10 +208,10 @@ class PDFBuilder:
                 if 'PLUGINURL' in HEALTHCHECKURL:
                     call_healthcheck_url(HEALTHCHECKURL['PLUGINURL'])
                 results = []
-                check_forms = ["resume_questionnaire_v3", "elem_men_v3", "elem_mon_v4", "sec_men_v3", "sec_mon_v3",
-                               "elem_ssa_v3", "sec_ssa_v3","sat_v3", "slo_v3"]
-                qms = PdfData.query.filter(PdfData.tries < self._config.retries,
-                                           PdfData.task_completed == False,PdfData.unique_id>964)\
+                # check_forms = ["resume_questionnaire_v3", "elem_men_v3", "elem_mon_v4", "sec_men_v3", "sec_mon_v3",
+                #                "elem_ssa_v3", "sec_ssa_v3","sat_v3", "slo_v3"]
+                qms = PdfData.query.filter( PdfData.tries < self._config.retries,
+                                           PdfData.task_completed == False)\
                     .order_by(desc(PdfData.tags['FORMSUBMISSIONDATE'].astext.cast(DATE))).limit(
                                                self._config.max_concurrency).all()
                 if not qms:
